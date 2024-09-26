@@ -1,4 +1,4 @@
-# react-native-lazy-image-cache
+# react-native-lazy-image-loader
 
 Supercharge your React Native app's image loading with advanced caching, lazy loading, and prefetching capabilities.
 
@@ -16,7 +16,7 @@ Supercharge your React Native app's image loading with advanced caching, lazy lo
 Get started with a simple npm install:
 
 ```bash
-npm install react-native-lazy-image-cache
+npm install react-native-lazy-image-loader
 ```
 
 ## Quick Start
@@ -26,7 +26,7 @@ Here's a basic example to get you up and running:
 ```jsx
 import React from 'react';
 import { View } from 'react-native';
-import { LazyImage } from 'react-native-lazy-image-cache';
+import { LazyImage } from 'react-native-lazy-image-loader';
 
 const MyComponent = () => (
   <View>
@@ -47,7 +47,7 @@ export default MyComponent;
 Preload images for a buttery-smooth UX:
 
 ```jsx
-import { prefetchImages } from 'react-native-lazy-image-cache';
+import { prefetchImages } from 'react-native-lazy-image-loader';
 
 const imageUrls = [
   'https://example.com/image1.jpg',
@@ -74,7 +74,7 @@ Add your own flair while images load:
 Take control of your app's image cache:
 
 ```jsx
-import { clearCache } from 'react-native-lazy-image-cache';
+import { clearCache } from 'react-native-lazy-image-loader';
 
 // Clear all cached images
 clearCache();
