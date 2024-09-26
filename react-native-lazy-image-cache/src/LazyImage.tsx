@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Image, ImageProps, ActivityIndicator, View } from 'react-native';
+import { Image, ImageProps, ActivityIndicator, View, ImageSourcePropType } from 'react-native';
 import { cacheImage, getCachedImage } from './imageCache';
 import { downloadQueue } from './downloadQueue';
 
 interface LazyImageProps extends Omit<ImageProps, 'source'> {
   source: { uri: string };
   placeholderColor?: string;
+  placeholderSource?: ImageSourcePropType;
 }
 
 const LazyImage: React.FC<LazyImageProps> = ({ source, style, placeholderColor = '#ccc', ...props }) => {
