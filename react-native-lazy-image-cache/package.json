@@ -1,0 +1,34 @@
+{
+    "name": "react-native-lazy-image-cache",
+    "version": "1.0.0",
+    "description": "A React Native library for lazy loading and caching images",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "files": [
+        "lib",
+        "assets"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "prepare": "npm run build"
+    },
+    "keywords": [
+        "react-native",
+        "image",
+        "lazy-loading",
+        "caching"
+    ],
+    "author": "Mauro Garcia",
+    "license": "MIT",
+    "peerDependencies": {
+        "react": ">=16.8.0",
+        "react-native": ">=0.60.0",
+        "react-native-fs": "^2.20.0"
+    },
+    "dependencies": {
+        "crypto-js": "^4.1.1"
+    },
+    "devDependencies": {
+        "@types/crypto-js": "^4.2.2"
+    }
+}
