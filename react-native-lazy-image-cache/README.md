@@ -10,6 +10,8 @@ Supercharge your React Native app's image loading with advanced caching, lazy lo
 - 🎨 Customizable placeholders and error images
 - 📏 Automatic image resizing
 - 🔧 Flexible cache management
+- 👁️ Visibility culling for improved performance
+- 🔍 Dynamic image quality adjustment
 
 ## Installation
 
@@ -74,10 +76,27 @@ Add your own flair while images load:
 Take control of your app's image cache:
 
 ```jsx
-import { clearCache } from 'react-native-lazy-image-loader';
+import { clearCache, getCacheSize } from 'react-native-lazy-image-loader';
 
 // Clear all cached images
 clearCache();
+
+// Get current cache size
+const size = await getCacheSize();
+console.log(`Current cache size: ${size} bytes`);
+```
+
+### Visibility Culling
+
+Optimize performance by only loading visible images:
+
+```jsx
+<LazyImage
+  source={{ uri: 'https://example.com/image.jpg' }}
+  style={{ width: 300, height: 200 }}
+  cullingDistance={300}
+  onVisibilityChange={(isVisible) => console.log('Image visibility:', isVisible)}
+/>
 ```
 
 ## API Reference
@@ -90,12 +109,20 @@ clearCache();
 | `style` | `ViewStyle` | Styles for the image container |
 | `placeholderSource` | `ImageSourcePropType` | (Optional) Custom placeholder image |
 | `resizeMode` | `'cover' \| 'contain' \| 'stretch' \| 'center'` | (Optional) Image resize mode |
+| `cullingDistance` | `number` | (Optional) Distance in pixels to start loading the image |
+| `onVisibilityChange` | `(isVisible: boolean) => void` | (Optional) Callback when image visibility changes |
 
 ### Utility Functions
 
 - `prefetchImages(urls: string[]): Promise<void>`
 - `clearCache(): Promise<void>`
 - `getCacheSize(): Promise<number>`
+
+## Performance Tips
+
+- Use `cullingDistance` to fine-tune when images start loading based on your app's scroll behavior.
+- Implement `onVisibilityChange` to pause/resume other operations based on image visibility.
+- Prefetch critical images during app initialization for instant display.
 
 ## Contributing
 
