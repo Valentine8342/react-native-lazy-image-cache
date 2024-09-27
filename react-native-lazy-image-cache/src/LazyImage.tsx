@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Image, ImageProps, ActivityIndicator, View, ImageSourcePropType, NativeSyntheticEvent, ImageErrorEventData } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Image, ImageProps, ActivityIndicator, View, ImageSourcePropType, NativeSyntheticEvent, ImageErrorEventData, Dimensions, InteractionManager } from 'react-native';
 import { getCachedImage } from './imageCache';
 import { downloadQueue } from './downloadQueue';
 import RNFS from 'react-native-fs';
@@ -15,6 +15,8 @@ interface LazyImageProps extends Omit<ImageProps, 'source'> {
   onError?: (error: NativeSyntheticEvent<ImageErrorEventData>) => void;
   onCustomError?: (error: Error) => void;
   priority?: 'low' | 'normal' | 'high';
+  onVisibilityChange?: (isVisible: boolean) => void;
+  cullingDistance?: number;
 }
 
 const LazyImage: React.FC<LazyImageProps> = ({
@@ -29,15 +31,31 @@ const LazyImage: React.FC<LazyImageProps> = ({
   onError,
   onCustomError,
   priority = 'normal',
+  onVisibilityChange,
+  cullingDistance = 1000,
   ...props
 }) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const imageRef = useRef<View>(null);
+  const checkVisibilityIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
     loadImage();
+    startVisibilityCheck();
+
+    return () => {
+      if (checkVisibilityIntervalRef.current !== null) {
+        clearInterval(checkVisibilityIntervalRef.current);
+      }
+    };
   }, [source.uri]);
+
+  useEffect(() => {
+    onVisibilityChange?.(isVisible);
+  }, [isVisible]);
 
   const loadImage = async () => {
     try {
@@ -45,8 +63,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
       if (cachedUri) {
         const fileExists = await RNFS.exists(cachedUri);
         if (fileExists) {
-          const imageUri = `file://${cachedUri}`;
-          setImageUri(imageUri);
+          setImageUri(`file://${cachedUri}`);
           setLoading(false);
           onLoad?.();
         } else {
@@ -54,8 +71,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
         }
       } else {
         const downloadedUri = await downloadQueue.enqueue(source.uri, priority);
-        const imageUri = `file://${downloadedUri}`;
-        setImageUri(imageUri);
+        setImageUri(`file://${downloadedUri}`);
         setLoading(false);
         onLoad?.();
       }
@@ -66,8 +82,24 @@ const LazyImage: React.FC<LazyImageProps> = ({
     }
   };
 
+  const checkVisibility = () => {
+    if (imageRef.current) {
+      imageRef.current.measure((x, y, width, height, pageX, pageY) => {
+        const screenHeight = Dimensions.get('window').height;
+        const isVisible = (pageY >= -cullingDistance && pageY < screenHeight + cullingDistance);
+        setIsVisible(isVisible);
+      });
+    }
+  };
+
+  const startVisibilityCheck = () => {
+    checkVisibilityIntervalRef.current = setInterval(() => {
+      InteractionManager.runAfterInteractions(checkVisibility);
+    }, 100) as unknown as number;
+  };
+
   return (
-    <View style={style}>
+    <View style={style} ref={imageRef}>
       {loading ? (
         <View
           style={[
@@ -92,7 +124,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
             ]}
           />
         )
-      ) : (
+      ) : isVisible ? (
         <Image
           source={{ uri: imageUri || source.uri }}
           style={style}
@@ -102,7 +134,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
           }}
           {...props}
         />
-      )}
+      ) : null}
     </View>
   );
 };
