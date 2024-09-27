@@ -55,7 +55,6 @@ const LazyImage: React.FC<LazyImageProps> = ({
           }
         }
       } catch (error) {
-        console.error('Error loading image:', error);
         if (isMounted) {
           setLoading(false);
           setError(error instanceof Error ? error : new Error('Unknown error'));

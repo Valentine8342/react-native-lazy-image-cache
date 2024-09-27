@@ -30,7 +30,6 @@ export const getCachedImage = async (uri: string): Promise<string | null> => {
     }
     return null;
   } catch (error) {
-    console.error('Error checking cached image:', error);
     return null;
   }
 };
@@ -48,34 +47,23 @@ export const cacheImage = async (uri: string): Promise<string> => {
 
     return `file://${cachePath}`;
   } catch (error) {
-    console.error('Error caching image:', error);
     return uri;
   }
 };
 
 export const clearCache = async (): Promise<void> => {
   try {
-    const exists = await RNFS.exists(CACHE_DIR);
-    if (exists) {
-      await RNFS.unlink(CACHE_DIR);
-    }
+    await RNFS.unlink(CACHE_DIR);
     await RNFS.mkdir(CACHE_DIR);
   } catch (error) {
-    console.error('Error clearing cache:', error);
   }
 };
 
 export const getCacheSize = async (): Promise<number> => {
   try {
-    const exists = await RNFS.exists(CACHE_DIR);
-    if (!exists) {
-      await RNFS.mkdir(CACHE_DIR);
-      return 0;
-    }
     const result = await RNFS.readDir(CACHE_DIR);
     return result.reduce((total, file) => total + file.size, 0);
   } catch (error) {
-    console.error('Error getting cache size:', error);
     return 0;
   }
 };
