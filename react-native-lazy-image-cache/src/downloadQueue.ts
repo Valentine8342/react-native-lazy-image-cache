@@ -2,6 +2,7 @@ import { cacheImage } from './imageCache';
 
 interface QueueItem {
     uri: string;
+    priority: 'low' | 'normal' | 'high';
     resolve: (value: string) => void;
     reject: (reason?: any) => void;
   }
@@ -11,11 +12,20 @@ interface QueueItem {
     private concurrentDownloads = 2;
     private activeDownloads = 0;
   
-    enqueue(uri: string): Promise<string> {
+    enqueue(uri: string, priority: 'low' | 'normal' | 'high' = 'normal'): Promise<string> {
       return new Promise((resolve, reject) => {
-        this.queue.push({ uri, resolve, reject });
+        this.queue.push({ uri, priority, resolve, reject });
+        this.queue.sort((a, b) => this.getPriorityValue(b.priority) - this.getPriorityValue(a.priority));
         this.processQueue();
       });
+    }
+  
+    private getPriorityValue(priority: 'low' | 'normal' | 'high'): number {
+      switch (priority) {
+        case 'high': return 3;
+        case 'normal': return 2;
+        case 'low': return 1;
+      }
     }
   
     private async processQueue() {
