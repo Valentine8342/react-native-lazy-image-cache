@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Image, ImageProps, ActivityIndicator, View, ImageSourcePropType, NativeSyntheticEvent, ImageErrorEventData } from 'react-native';
-import { cacheImage, getCachedImage } from './imageCache';
+import { getCachedImage } from './imageCache';
 import { downloadQueue } from './downloadQueue';
+import RNFS from 'react-native-fs';
 
 interface LazyImageProps extends Omit<ImageProps, 'source'> {
   source: { uri: string };
@@ -19,7 +20,7 @@ interface LazyImageProps extends Omit<ImageProps, 'source'> {
 const LazyImage: React.FC<LazyImageProps> = ({
   source,
   style,
-  placeholderColor = '#ccc',
+  placeholderColor = '#f0f0f0',
   placeholderSource,
   fallbackSource,
   resizeMode = 'cover',
@@ -31,68 +32,79 @@ const LazyImage: React.FC<LazyImageProps> = ({
   ...props
 }) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadImage = async () => {
-      try {
-        const cachedUri = await getCachedImage(source.uri);
-        if (cachedUri) {
-          if (isMounted) {
-            setImageUri(cachedUri);
-            setLoading(false);
-            onLoad?.();
-          }
-        } else {
-          const downloadedUri = await downloadQueue.enqueue(source.uri, priority);
-          if (isMounted) {
-            setImageUri(downloadedUri);
-            setLoading(false);
-            onLoad?.();
-          }
-        }
-      } catch (error) {
-        if (isMounted) {
-          setLoading(false);
-          setError(error instanceof Error ? error : new Error('Unknown error'));
-          onCustomError?.(error instanceof Error ? error : new Error('Unknown error'));
-        }
-      }
-    };
-
     loadImage();
+  }, [source.uri]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [source.uri, priority, onLoad, onCustomError]);
+  const loadImage = async () => {
+    try {
+      const cachedUri = await getCachedImage(source.uri);
+      if (cachedUri) {
+        const fileExists = await RNFS.exists(cachedUri);
+        if (fileExists) {
+          const imageUri = `file://${cachedUri}`;
+          setImageUri(imageUri);
+          setLoading(false);
+          onLoad?.();
+        } else {
+          throw new Error('Cached file does not exist');
+        }
+      } else {
+        const downloadedUri = await downloadQueue.enqueue(source.uri, priority);
+        const imageUri = `file://${downloadedUri}`;
+        setImageUri(imageUri);
+        setLoading(false);
+        onLoad?.();
+      }
+    } catch (error) {
+      setLoading(false);
+      setError(error instanceof Error ? error : new Error('Unknown error'));
+      onCustomError?.(error instanceof Error ? error : new Error('Unknown error'));
+    }
+  };
 
-  if (loading) {
-    return (
-      <View style={[style, { backgroundColor: placeholderColor, justifyContent: 'center', alignItems: 'center' }]}>
-        {loadingComponent || (
-          placeholderSource ? (
-            <Image source={placeholderSource} style={style} resizeMode={resizeMode} />
-          ) : (
-            <ActivityIndicator size="small" color="#999" />
-          )
-        )}
-      </View>
-    );
-  }
-
-  if (error && fallbackSource) {
-    return <Image source={fallbackSource} style={style} resizeMode={resizeMode} {...props} />;
-  }
-
-  return <Image source={{ uri: imageUri || source.uri }} style={style} resizeMode={resizeMode} onError={onError} {...props} />;
+  return (
+    <View style={style}>
+      {loading ? (
+        <View
+          style={[
+            style,
+            {
+              backgroundColor: placeholderColor,
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+          ]}
+        >
+          {loadingComponent || <ActivityIndicator size="small" color="#999" />}
+        </View>
+      ) : error ? (
+        fallbackSource ? (
+          <Image source={fallbackSource} style={style} resizeMode={resizeMode} {...props} />
+        ) : (
+          <View
+            style={[
+              style,
+              { backgroundColor: 'red', justifyContent: 'center', alignItems: 'center' },
+            ]}
+          />
+        )
+      ) : (
+        <Image
+          source={{ uri: imageUri || source.uri }}
+          style={style}
+          resizeMode={resizeMode}
+          onError={(e) => {
+            onError?.(e);
+          }}
+          {...props}
+        />
+      )}
+    </View>
+  );
 };
 
 export default LazyImage;
-
-export const prefetchImages = async (urls: string[]): Promise<void> => {
-  await Promise.all(urls.map(url => downloadQueue.enqueue(url)));
-};

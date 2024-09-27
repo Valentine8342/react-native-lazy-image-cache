@@ -3,30 +3,38 @@ import RNFS from 'react-native-fs';
 import * as CryptoJS from 'crypto-js';
 
 const BASE_DIR = Platform.OS === 'ios' 
-  ? RNFS.CachesDirectoryPath 
-  : RNFS.ExternalCachesDirectoryPath;
+  ? `${RNFS.CachesDirectoryPath}/imageCache`
+  : `${RNFS.ExternalCachesDirectoryPath}/imageCache`;
 
-const CACHE_DIR = `${BASE_DIR}/imageCache`;
-const CACHE_EXPIRATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+const CACHE_EXPIRATION = 7 * 24 * 60 * 60 * 1000;
 
 export const getCacheKey = (uri: string): string => {
   return CryptoJS.SHA1(uri).toString();
 };
 
+const getFileExtension = (uri: string): string => {
+  const match = uri.match(/\.(\w+)(\?.*)?$/);
+  return match ? `.${match[1]}` : '.jpg';
+};
+
 export const getCachedImage = async (uri: string): Promise<string | null> => {
   const cacheKey = getCacheKey(uri);
-  const cachePath = `${CACHE_DIR}/${cacheKey}`;
+  const fileExtension = getFileExtension(uri);
+  const cachePath = `${BASE_DIR}/${cacheKey}${fileExtension}`;
 
   try {
+    await RNFS.mkdir(BASE_DIR);
     const exists = await RNFS.exists(cachePath);
+
+
     if (exists) {
       const stats = await RNFS.stat(cachePath);
-      const now = new Date().getTime();
+      const now = Date.now();
       if (now - stats.mtime > CACHE_EXPIRATION) {
         await RNFS.unlink(cachePath);
         return null;
       }
-      return `file://${cachePath}`;
+      return cachePath;
     }
     return null;
   } catch (error) {
@@ -36,16 +44,21 @@ export const getCachedImage = async (uri: string): Promise<string | null> => {
 
 export const cacheImage = async (uri: string): Promise<string> => {
   const cacheKey = getCacheKey(uri);
-  const cachePath = `${CACHE_DIR}/${cacheKey}`;
+  const fileExtension = getFileExtension(uri);
+  const cachePath = `${BASE_DIR}/${cacheKey}${fileExtension}`;
 
   try {
-    await RNFS.mkdir(CACHE_DIR);
-    await RNFS.downloadFile({
+    await RNFS.mkdir(BASE_DIR);
+    const result = await RNFS.downloadFile({
       fromUrl: uri,
       toFile: cachePath,
     }).promise;
 
-    return `file://${cachePath}`;
+    if (result.statusCode === 200) {
+      return cachePath;
+    } else {
+      return uri;
+    }
   } catch (error) {
     return uri;
   }
@@ -53,16 +66,15 @@ export const cacheImage = async (uri: string): Promise<string> => {
 
 export const clearCache = async (): Promise<void> => {
   try {
-    await RNFS.unlink(CACHE_DIR);
-    await RNFS.mkdir(CACHE_DIR);
+    await RNFS.unlink(BASE_DIR);
   } catch (error) {
   }
 };
 
 export const getCacheSize = async (): Promise<number> => {
   try {
-    const result = await RNFS.readDir(CACHE_DIR);
-    return result.reduce((total, file) => total + file.size, 0);
+    const stats = await RNFS.stat(BASE_DIR);
+    return stats.size;
   } catch (error) {
     return 0;
   }
