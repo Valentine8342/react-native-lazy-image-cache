@@ -1,6 +1,6 @@
 {
     "name": "react-native-lazy-image-loader",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "A React Native library for lazy loading and caching images",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -30,5 +30,9 @@
     },
     "devDependencies": {
         "@types/crypto-js": "^4.2.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Valentine8342/react-native-lazy-image-cache.git"
     }
 }
