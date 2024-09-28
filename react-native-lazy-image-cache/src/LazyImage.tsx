@@ -132,7 +132,6 @@ const LazyImage: React.FC<LazyImageProps> = ({
 
           setOpacityValue(visiblePercentage);
           setIsVisible(isVisible);
-          console.log(`Image visibility changed to: ${isVisible}`);
         });
       }
     }
