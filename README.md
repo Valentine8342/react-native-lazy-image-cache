@@ -145,7 +145,7 @@ Note: The fade effect is currently only available on iOS devices.
 
 ## Contributing
 
-We welcome contributions! Please check out our Contributing Guide for guidelines on how to proceed.
+Please visit the GitHub repository to contribute. Follow standard GitHub practices for pull requests and issues.
 
 ## License
 
