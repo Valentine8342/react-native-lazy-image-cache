@@ -113,7 +113,7 @@ Implement a smooth fade-in effect as images come into view:
 
 Here's how the fade effect looks in action:
 
-![Fade Effect Demo](./src/assets/fade-effect-demo.gif)
+![Fade Effect Demo](https://i.imgur.com/tF3MVvR.gif)
 
 Note: The fade effect is currently only available on iOS devices.
 
