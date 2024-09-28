@@ -99,6 +99,24 @@ Optimize performance by only loading visible images:
 />
 ```
 
+### Fade Effect (iOS only)
+
+Implement a smooth fade-in effect as images come into view:
+
+```jsx
+<LazyImage
+  source={{ uri: 'https://example.com/image.jpg' }}
+  style={{ width: 300, height: 200 }}
+  fade={true}
+/>
+```
+
+Here's how the fade effect looks in action:
+
+![Fade Effect Demo](./src/assets/fade-effect-demo.gif)
+
+Note: The fade effect is currently only available on iOS devices.
+
 ## API Reference
 
 ### LazyImage
@@ -111,6 +129,7 @@ Optimize performance by only loading visible images:
 | `resizeMode` | `'cover' \| 'contain' \| 'stretch' \| 'center'` | (Optional) Image resize mode |
 | `cullingDistance` | `number` | (Optional) Distance in pixels to start loading the image |
 | `onVisibilityChange` | `(isVisible: boolean) => void` | (Optional) Callback when image visibility changes |
+| `fade` | `boolean` | (Optional) Enable fade-in effect as image becomes visible (iOS only) |
 
 ### Utility Functions
 
