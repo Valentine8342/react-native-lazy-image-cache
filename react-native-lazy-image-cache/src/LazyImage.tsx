@@ -64,7 +64,6 @@ const LazyImage: React.FC<LazyImageProps> = ({
   }, [fade, opacityValue]);
 
   useEffect(() => {
-    console.log('Loading image:', source.uri);
     loadImage();
     startVisibilityCheck();
 
@@ -93,13 +92,11 @@ const LazyImage: React.FC<LazyImageProps> = ({
         }
       } else {
         const downloadedUri = await downloadQueue.enqueue(source.uri, priority);
-        console.log('Downloaded URI:', downloadedUri);
         setImageUri(`file://${downloadedUri}`);
         setLoading(false);
         onLoad?.();
       }
     } catch (error) {
-      console.error('Error loading image:', error);
       setLoading(false);
       setError(error instanceof Error ? error : new Error('Unknown error'));
       onCustomError?.(error instanceof Error ? error : new Error('Unknown error'));
@@ -183,7 +180,6 @@ const LazyImage: React.FC<LazyImageProps> = ({
           style={[style, { opacity }]}
           resizeMode={resizeMode}
           onError={(e) => {
-            console.log('Image load error:', e.nativeEvent.error);
             onError?.(e);
           }}
           {...props}
