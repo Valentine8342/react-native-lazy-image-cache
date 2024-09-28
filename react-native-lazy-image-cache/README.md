@@ -99,7 +99,7 @@ Optimize performance by only loading visible images:
 />
 ```
 
-### Fade Effect (iOS only)
+### Fade Effect
 
 Implement a smooth fade-in effect as images come into view:
 
@@ -115,7 +115,6 @@ Here's how the fade effect looks in action:
 
 ![Fade Effect Demo](https://github.com/Valentine8342/react-native-lazy-image-cache/blob/main/react-native-lazy-image-cache/src/assets/fade-effect-demo.gif?raw=true)
 
-Note: The fade effect is currently only available on iOS devices.
 
 ## API Reference
 
@@ -129,7 +128,7 @@ Note: The fade effect is currently only available on iOS devices.
 | `resizeMode` | `'cover' \| 'contain' \| 'stretch' \| 'center'` | (Optional) Image resize mode |
 | `cullingDistance` | `number` | (Optional) Distance in pixels to start loading the image |
 | `onVisibilityChange` | `(isVisible: boolean) => void` | (Optional) Callback when image visibility changes |
-| `fade` | `boolean` | (Optional) Enable fade-in effect as image becomes visible (iOS only) |
+| `fade` | `boolean` | (Optional) Enable fade-in effect as image becomes visible |
 
 ### Utility Functions
 

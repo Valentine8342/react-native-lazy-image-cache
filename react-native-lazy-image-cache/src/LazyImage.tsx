@@ -11,6 +11,7 @@ import {
   Platform,
   UIManager,
   findNodeHandle,
+  ScrollView,
 } from 'react-native';
 import { getCachedImage } from './imageCache';
 import { downloadQueue } from './downloadQueue';
@@ -54,8 +55,11 @@ const LazyImage: React.FC<LazyImageProps> = ({
   const [error, setError] = useState<Error | null>(null);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [opacityValue, setOpacityValue] = useState<number>(1);
+  const [layout, setLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const imageRef = useRef<View>(null);
   const checkVisibilityIntervalRef = useRef<number | null>(null);
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const intersectionObserver = useRef<number | null>(null);
 
   const opacity = useMemo(() => {
     if (!fade) return 1; 
@@ -65,18 +69,23 @@ const LazyImage: React.FC<LazyImageProps> = ({
 
   useEffect(() => {
     loadImage();
-    startVisibilityCheck();
+    if (fade) {
+      startIntersectionObserver();
+    }
 
     return () => {
+      if (intersectionObserver.current !== null) {
+        cancelAnimationFrame(intersectionObserver.current);
+      }
       if (checkVisibilityIntervalRef.current !== null) {
         clearInterval(checkVisibilityIntervalRef.current);
       }
     };
-  }, [source.uri]);
+  }, [source.uri, fade]);
 
   useEffect(() => {
-    onVisibilityChange?.(isVisible);
-  }, [isVisible, onVisibilityChange]);
+    onVisibilityChange?.(isIntersecting);
+  }, [isIntersecting, onVisibilityChange]);
 
   const loadImage = async () => {
     try {
@@ -101,6 +110,58 @@ const LazyImage: React.FC<LazyImageProps> = ({
       setError(error instanceof Error ? error : new Error('Unknown error'));
       onCustomError?.(error instanceof Error ? error : new Error('Unknown error'));
     }
+  };
+
+  const checkIntersection = () => {
+    if (imageRef.current) {
+      const nodeHandle = findNodeHandle(imageRef.current);
+      if (nodeHandle) {
+        UIManager.measure(nodeHandle, (x, y, width, height, pageX, pageY) => {
+          const windowHeight = Dimensions.get('window').height;
+          const windowWidth = Dimensions.get('window').width;
+
+          const isVisible =
+            pageY < windowHeight &&
+            pageY + height > 0 &&
+            pageX < windowWidth &&
+            pageX + width > 0;
+
+          let visibleHeight = Math.min(windowHeight, pageY + height) - Math.max(pageY, 0);
+          let visiblePercentage = Math.max(0, Math.min(1, visibleHeight / height));
+
+          if (Platform.OS === 'ios') {
+            const visibleHeightIOS =
+              Math.min(windowHeight - pageY, height) - Math.max(0, -pageY);
+            visiblePercentage = Math.max(0, Math.min(1, visibleHeightIOS / height));
+          }
+
+          setOpacityValue(visiblePercentage);
+          setIsIntersecting(isVisible);
+        });
+      }
+    }
+    intersectionObserver.current = requestAnimationFrame(checkIntersection);
+  };
+
+  const startIntersectionObserver = () => {
+    if (intersectionObserver.current !== null) {
+      cancelAnimationFrame(intersectionObserver.current);
+    }
+    intersectionObserver.current = requestAnimationFrame(checkIntersection);
+  };
+
+  const startVisibilityCheck = () => {
+    if (!fade) return; 
+
+    checkVisibility();
+
+    if (checkVisibilityIntervalRef.current !== null) {
+      clearInterval(checkVisibilityIntervalRef.current);
+    }
+
+    checkVisibilityIntervalRef.current = setInterval(() => {
+      requestAnimationFrame(checkVisibility);
+    }, 100) as unknown as number;
   };
 
   const checkVisibility = () => {
@@ -134,22 +195,11 @@ const LazyImage: React.FC<LazyImageProps> = ({
     }
   };
 
-  const startVisibilityCheck = () => {
-    if (!fade) return; 
-
-    checkVisibility();
-
-    if (checkVisibilityIntervalRef.current !== null) {
-      clearInterval(checkVisibilityIntervalRef.current);
-    }
-
-    checkVisibilityIntervalRef.current = setInterval(() => {
-      requestAnimationFrame(checkVisibility);
-    }, 100) as unknown as number;
-  };
-
   return (
-    <View style={style} ref={imageRef}>
+    <View style={style} ref={imageRef} onLayout={(event) => {
+      const { x, y, width, height } = event.nativeEvent.layout;
+      setLayout({ x, y, width, height });
+    }}>
       {loading ? (
         <View
           style={[
