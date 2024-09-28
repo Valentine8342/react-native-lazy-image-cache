@@ -79,3 +79,14 @@ export const getCacheSize = async (): Promise<number> => {
     return 0;
   }
 };
+
+export const prefetchImage = async (uri: string): Promise<void> => {
+  try {
+    const cachedPath = await getCachedImage(uri);
+    if (!cachedPath) {
+      await cacheImage(uri);
+    }
+  } catch (error) {
+    console.error(`Error prefetching image: ${uri}`, error);
+  }
+};
