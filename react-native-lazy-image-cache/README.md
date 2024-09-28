@@ -113,7 +113,7 @@ Implement a smooth fade-in effect as images come into view:
 
 Here's how the fade effect looks in action:
 
-![Fade Effect Demo](https://i.imgur.com/tF3MVvR.gif)
+![Fade Effect Demo](https://github.com/Valentine8342/react-native-lazy-image-cache/blob/main/react-native-lazy-image-cache/src/assets/fade-effect-demo.gif?raw=true)
 
 Note: The fade effect is currently only available on iOS devices.
 
