@@ -2,6 +2,12 @@
 
 Supercharge your React Native app's image loading with advanced caching, lazy loading, and prefetching capabilities.
 
+[<span style="color: red;">Lazy Loading Made Easy</span>](https://medium.com/@valentineminer27/lazy-loading-images-with-react-native-da614f652667)
+
+![npm downloads](https://img.shields.io/npm/dt/react-native-lazy-image-loader.svg)
+![npm version](https://img.shields.io/npm/v/react-native-lazy-image-loader.svg)
+![license](https://img.shields.io/npm/l/react-native-lazy-image-loader.svg)
+
 ## Features
 
 - 🚀 Lazy loading for optimal performance
