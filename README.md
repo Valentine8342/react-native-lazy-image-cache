@@ -2,6 +2,12 @@
 
 Supercharge your React Native app's image loading with advanced caching, lazy loading, and prefetching capabilities.
 
+[<span style="color: red;">Lazy Loading Made Easy</span>](https://medium.com/@valentineminer27/lazy-loading-images-with-react-native-da614f652667)
+
+![npm downloads](https://img.shields.io/npm/dt/react-native-lazy-image-loader.svg)
+![npm version](https://img.shields.io/npm/v/react-native-lazy-image-loader.svg)
+![license](https://img.shields.io/npm/l/react-native-lazy-image-loader.svg)
+
 ## Features
 
 - 🚀 Lazy loading for optimal performance
@@ -137,21 +143,82 @@ Here's how the blur effect looks in action:
 
 ### LazyImage
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `source` | `ImageSourcePropType` | The source of the image |
-| `style` | `ViewStyle` | Styles for the image container |
-| `placeholderSource` | `ImageSourcePropType` | (Optional) Custom placeholder image |
-| `fallbackSource` | `ImageSourcePropType` | (Optional) Fallback image to display on error |
-| `resizeMode` | `'cover' \| 'contain' \| 'stretch' \| 'center'` | (Optional) Image resize mode |
-| `cullingDistance` | `number` | (Optional) Distance in pixels to start loading the image |
-| `onVisibilityChange` | `(isVisible: boolean) => void` | (Optional) Callback when image visibility changes |
-| `fade` | `boolean` | (Optional) Enable fade-in effect as image becomes visible |
-| `blurRadius` | `number` | (Optional) Blur radius for the placeholder image |
-| `priority` | `'low' \| 'normal' \| 'high'` | (Optional) Download priority for the image |
-| `onLoad` | `() => void` | (Optional) Callback when the image finishes loading |
-| `onError` | `(error: NativeSyntheticEvent<ImageErrorEventData>) => void` | (Optional) Callback when an error occurs during loading |
-| `onCustomError` | `(error: Error) => void` | (Optional) Callback for custom error handling |
+<table width="100%">
+  <thead>
+    <tr>
+      <th width="20%">Prop</th>
+      <th width="30%">Type</th>
+      <th width="50%">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>source</code></td>
+      <td><code>ImageSourcePropType</code></td>
+      <td>The source of the image</td>
+    </tr>
+    <tr>
+      <td><code>style</code></td>
+      <td><code>ViewStyle</code></td>
+      <td>Styles for the image container</td>
+    </tr>
+    <tr>
+      <td><code>placeholderSource</code></td>
+      <td><code>ImageSourcePropType</code></td>
+      <td>(Optional) Custom placeholder image</td>
+    </tr>
+    <tr>
+      <td><code>fallbackSource</code></td>
+      <td><code>ImageSourcePropType</code></td>
+      <td>(Optional) Fallback image to display on error</td>
+    </tr>
+    <tr>
+      <td><code>resizeMode</code></td>
+      <td><code>'cover' | 'contain' | 'stretch' | 'center'</code></td>
+      <td>(Optional) Image resize mode</td>
+    </tr>
+    <tr>
+      <td><code>cullingDistance</code></td>
+      <td><code>number</code></td>
+      <td>(Optional) Distance in pixels to start loading the image</td>
+    </tr>
+    <tr>
+      <td><code>onVisibilityChange</code></td>
+      <td><code>(isVisible: boolean) => void</code></td>
+      <td>(Optional) Callback when image visibility changes</td>
+    </tr>
+    <tr>
+      <td><code>fade</code></td>
+      <td><code>boolean</code></td>
+      <td>(Optional) Enable fade-in effect as image becomes visible</td>
+    </tr>
+    <tr>
+      <td><code>blurRadius</code></td>
+      <td><code>number</code></td>
+      <td>(Optional) Blur radius for the placeholder image</td>
+    </tr>
+    <tr>
+      <td><code>priority</code></td>
+      <td><code>'low' | 'normal' | 'high'</code></td>
+      <td>(Optional) Download priority for the image</td>
+    </tr>
+    <tr>
+      <td><code>onLoad</code></td>
+      <td><code>() => void</code></td>
+      <td>(Optional) Callback when the image finishes loading</td>
+    </tr>
+    <tr>
+      <td><code>onError</code></td>
+      <td><code>(error: NativeSyntheticEvent<ImageErrorEventData>) => void</code></td>
+      <td>(Optional) Callback when an error occurs during loading</td>
+    </tr>
+    <tr>
+      <td><code>onCustomError</code></td>
+      <td><code>(error: Error) => void</code></td>
+      <td>(Optional) Callback for custom error handling</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Utility Functions
 
