@@ -19,7 +19,7 @@ import RNFS from 'react-native-fs';
 import { StyleSheet } from 'react-native';
 
 interface LazyImageProps extends Omit<ImageProps, 'source'> {
-  source: { uri: string };
+  source: ImageSourcePropType;
   placeholderColor?: string;
   placeholderSource?: ImageSourcePropType;
   fallbackSource?: ImageSourcePropType;
@@ -84,7 +84,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
         clearInterval(checkVisibilityIntervalRef.current);
       }
     };
-  }, [source.uri, fade]);
+  }, [source, fade]);
 
   useEffect(() => {
     onVisibilityChange?.(isIntersecting);
@@ -92,21 +92,32 @@ const LazyImage: React.FC<LazyImageProps> = ({
 
   const loadImage = async () => {
     try {
-      const cachedUri = await getCachedImage(source.uri);
-      if (cachedUri) {
-        const fileExists = await RNFS.exists(cachedUri);
-        if (fileExists) {
-          setImageUri(`file://${cachedUri}`);
-          setLoading(false);
-          onLoad?.();
-        } else {
-          throw new Error('Cached file does not exist');
-        }
-      } else {
-        const downloadedUri = await downloadQueue.enqueue(source.uri, priority);
-        setImageUri(`file://${downloadedUri}`);
+      if (typeof source === 'number') {
+        setImageUri(Image.resolveAssetSource(source).uri);
         setLoading(false);
         onLoad?.();
+      } else if (typeof source === 'object' && 'uri' in source) {
+        const uri = source.uri;
+        if (uri) {
+          const cachedUri = await getCachedImage(uri);
+          if (cachedUri) {
+            const fileExists = await RNFS.exists(cachedUri);
+            if (fileExists) {
+              setImageUri(`file://${cachedUri}`);
+              setLoading(false);
+              onLoad?.();
+            } else {
+              throw new Error('Cached file does not exist');
+            }
+          } else {
+            const downloadedUri = await downloadQueue.enqueue(uri, priority);
+            setImageUri(`file://${downloadedUri}`);
+            setLoading(false);
+            onLoad?.();
+          }
+        }
+      } else {
+        throw new Error('Invalid source type');
       }
     } catch (error) {
       setLoading(false);
@@ -205,7 +216,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
     }}>
       {loading ? (
         <Image
-          source={{ uri: source.uri }}
+          source={typeof source === 'number' ? source : { uri: (source as { uri: string }).uri }}
           style={[StyleSheet.absoluteFill, style]}
           blurRadius={blurRadius}
           resizeMode={resizeMode}
@@ -223,7 +234,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
         )
       ) : (
         <Image
-          source={{ uri: imageUri || source.uri }}
+          source={{ uri: imageUri || (typeof source === 'object' && 'uri' in source ? source.uri : undefined) }}
           style={[style, { opacity }]}
           resizeMode={resizeMode}
           onError={(e) => {
