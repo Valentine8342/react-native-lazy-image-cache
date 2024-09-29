@@ -16,6 +16,7 @@ import {
 import { getCachedImage } from './imageCache';
 import { downloadQueue } from './downloadQueue';
 import RNFS from 'react-native-fs';
+import { StyleSheet } from 'react-native';
 
 interface LazyImageProps extends Omit<ImageProps, 'source'> {
   source: { uri: string };
@@ -31,6 +32,7 @@ interface LazyImageProps extends Omit<ImageProps, 'source'> {
   onVisibilityChange?: (isVisible: boolean) => void;
   cullingDistance?: number;
   fade?: boolean;
+  blurRadius?: number;
 }
 
 const LazyImage: React.FC<LazyImageProps> = ({
@@ -47,7 +49,8 @@ const LazyImage: React.FC<LazyImageProps> = ({
   priority = 'normal',
   onVisibilityChange,
   cullingDistance = 1000,
-  fade = false, 
+  fade = false,
+  blurRadius = 5,
   ...props
 }) => {
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -201,18 +204,12 @@ const LazyImage: React.FC<LazyImageProps> = ({
       setLayout({ x, y, width, height });
     }}>
       {loading ? (
-        <View
-          style={[
-            style,
-            {
-              backgroundColor: placeholderColor,
-              justifyContent: 'center',
-              alignItems: 'center',
-            },
-          ]}
-        >
-          {loadingComponent || <ActivityIndicator size="small" color="#999" />}
-        </View>
+        <Image
+          source={{ uri: source.uri }}
+          style={[StyleSheet.absoluteFill, style]}
+          blurRadius={blurRadius}
+          resizeMode={resizeMode}
+        />
       ) : error ? (
         fallbackSource ? (
           <Image source={fallbackSource} style={style} resizeMode={resizeMode} {...props} />
@@ -234,6 +231,20 @@ const LazyImage: React.FC<LazyImageProps> = ({
           }}
           {...props}
         />
+      )}
+      {loading && (
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: 'rgba(0,0,0,0.3)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+          ]}
+        >
+          {loadingComponent || <ActivityIndicator size="small" color="#fff" />}
+        </View>
       )}
     </View>
   );
