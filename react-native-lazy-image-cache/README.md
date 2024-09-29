@@ -113,7 +113,7 @@ Implement a smooth fade-in effect as images come into view:
 />
 ```
 
-Here's how the fade effect looks like:
+Here's how the fade effect looks in action:
 
 ![Fade Effect Demo](https://github.com/Valentine8342/react-native-lazy-image-cache/blob/main/react-native-lazy-image-cache/src/assets/fade-effect-demo.gif?raw=true)
 
@@ -128,6 +128,10 @@ Add a blurred placeholder while the image is loading:
   blurRadius={5}
 />
 ```
+
+Here's how the blur effect looks in action:
+
+![Blur Effect Demo](https://github.com/Valentine8342/react-native-lazy-image-cache/blob/main/react-native-lazy-image-cache/src/assets/blur-effect-demo.gif?raw=true)
 
 ## API Reference
 
@@ -164,7 +168,7 @@ Add a blurred placeholder while the image is loading:
 
 ## Contributing
 
-We welcome contributions! Please check out our Contributing Guide for guidelines on how to proceed.
+To contribute, please visit the GitHub repository at https://github.com/Valentine8342/react-native-lazy-image-cache.
 
 ## License
 

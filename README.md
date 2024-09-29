@@ -12,6 +12,8 @@ Supercharge your React Native app's image loading with advanced caching, lazy lo
 - 🔧 Flexible cache management
 - 👁️ Visibility culling for improved performance
 - 🔍 Dynamic image quality adjustment
+- 🌟 Smooth fade-in effect
+- 🖼️ Blurred placeholder while loading
 
 ## Installation
 
@@ -115,6 +117,22 @@ Here's how the fade effect looks in action:
 
 ![Fade Effect Demo](https://github.com/Valentine8342/react-native-lazy-image-cache/blob/main/react-native-lazy-image-cache/src/assets/fade-effect-demo.gif?raw=true)
 
+### Blur Effect
+
+Add a blurred placeholder while the image is loading:
+
+```jsx
+<LazyImage
+  source={{ uri: 'https://example.com/image.jpg' }}
+  style={{ width: 300, height: 200 }}
+  blurRadius={5}
+/>
+```
+
+Here's how the blur effect looks in action:
+
+![Blur Effect Demo](https://github.com/Valentine8342/react-native-lazy-image-cache/blob/main/react-native-lazy-image-cache/src/assets/blur-effect-demo.gif?raw=true)
+
 ## API Reference
 
 ### LazyImage
@@ -124,10 +142,16 @@ Here's how the fade effect looks in action:
 | `source` | `ImageSourcePropType` | The source of the image |
 | `style` | `ViewStyle` | Styles for the image container |
 | `placeholderSource` | `ImageSourcePropType` | (Optional) Custom placeholder image |
+| `fallbackSource` | `ImageSourcePropType` | (Optional) Fallback image to display on error |
 | `resizeMode` | `'cover' \| 'contain' \| 'stretch' \| 'center'` | (Optional) Image resize mode |
 | `cullingDistance` | `number` | (Optional) Distance in pixels to start loading the image |
 | `onVisibilityChange` | `(isVisible: boolean) => void` | (Optional) Callback when image visibility changes |
 | `fade` | `boolean` | (Optional) Enable fade-in effect as image becomes visible |
+| `blurRadius` | `number` | (Optional) Blur radius for the placeholder image |
+| `priority` | `'low' \| 'normal' \| 'high'` | (Optional) Download priority for the image |
+| `onLoad` | `() => void` | (Optional) Callback when the image finishes loading |
+| `onError` | `(error: NativeSyntheticEvent<ImageErrorEventData>) => void` | (Optional) Callback when an error occurs during loading |
+| `onCustomError` | `(error: Error) => void` | (Optional) Callback for custom error handling |
 
 ### Utility Functions
 
@@ -140,10 +164,11 @@ Here's how the fade effect looks in action:
 - Use `cullingDistance` to fine-tune when images start loading based on your app's scroll behavior.
 - Implement `onVisibilityChange` to pause/resume other operations based on image visibility.
 - Prefetch critical images during app initialization for instant display.
+- Utilize the `priority` prop to manage download order for important images.
 
 ## Contributing
 
-We welcome contributions! Please check out our Contributing Guide for guidelines on how to proceed.
+To contribute, please visit the GitHub repository at https://github.com/Valentine8342/react-native-lazy-image-cache.
 
 ## License
 
